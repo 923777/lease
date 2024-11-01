@@ -21,7 +21,15 @@ Spring:
 mybatis-plus:
   global-config:
     db-config:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #      logic-delete-field:is_deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+minio:
+  endpoint: http://192.168.123.100:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: lease
+
 

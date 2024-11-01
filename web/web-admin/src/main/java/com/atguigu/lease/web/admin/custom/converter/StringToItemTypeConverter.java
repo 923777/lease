@@ -12,9 +12,9 @@ public class StringToItemTypeConverter  implements Converter<String, ItemType> {
 
     @Override
     public ItemType convert(String source) {
-        System.out.println("转换器执行了...");
+
         for (ItemType value : ItemType.values()) {
-            System.out.println("枚举值：");
+
             if (value.getCode().equals(Integer.valueOf(source))){
                 return value;
             }

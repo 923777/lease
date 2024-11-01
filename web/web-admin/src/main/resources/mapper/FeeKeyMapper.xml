@@ -16,6 +16,12 @@
             <result column="value_unit" property="unit"/>
             <result column="key_id" property="feeKeyId"/>
         </collection>
+<!--        <collection-->
+<!--                property="feeValueList"-->
+<!--                column="id"-->
+<!--                select="com.atguigu.lease.web.admin.mapper.FeeValueMapper.selectList"-->
+<!--                ofType="com.atguigu.lease.model.entity.FeeValue"-->
+<!--        ></collection>-->
     </resultMap>
 
     <sql id="Base_Column_List">

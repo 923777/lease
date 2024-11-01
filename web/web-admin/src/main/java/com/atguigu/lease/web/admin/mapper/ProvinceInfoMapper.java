@@ -1,7 +1,10 @@
 package com.atguigu.lease.web.admin.mapper;
 
+import com.atguigu.lease.model.entity.CityInfo;
 import com.atguigu.lease.model.entity.ProvinceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author HP
@@ -10,6 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.atguigu.lease.model.entity.ProvinceInfo
 */
 public interface ProvinceInfoMapper extends BaseMapper<ProvinceInfo> {
+
 
 }
 

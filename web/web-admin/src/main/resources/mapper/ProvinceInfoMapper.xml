@@ -16,4 +16,5 @@
         id,name,create_time,
         update_time,is_deleted
     </sql>
+
 </mapper>
