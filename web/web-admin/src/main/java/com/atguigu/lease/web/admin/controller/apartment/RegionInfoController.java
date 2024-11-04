@@ -9,7 +9,6 @@ import com.atguigu.lease.web.admin.service.CityInfoService;
 import com.atguigu.lease.web.admin.service.DistrictInfoService;
 import com.atguigu.lease.web.admin.service.ProvinceInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

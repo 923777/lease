@@ -8,7 +8,6 @@ import com.atguigu.lease.web.admin.service.FeeKeyService;
 import com.atguigu.lease.web.admin.service.FeeValueService;
 import com.atguigu.lease.web.admin.vo.fee.FeeKeyVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +56,8 @@ public class FeeController {
         LambdaQueryWrapper<FeeValue> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FeeValue::getFeeKeyId, feeKeyId);
         feeValueService.remove(queryWrapper);
+//        feeValueService.
+//        feeValueService.update(new LambdaQueryWrapper<FeeValue>().eq;
 //        feeValueService.remove(new<FeeValue> QueryWrapper().eq("fee_key_id", feeKeyId));
         return Result.ok();
     }

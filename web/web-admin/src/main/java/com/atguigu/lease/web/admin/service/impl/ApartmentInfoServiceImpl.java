@@ -1,10 +1,26 @@
 package com.atguigu.lease.web.admin.service.impl;
 
+import com.atguigu.lease.model.entity.*;
+import com.atguigu.lease.model.enums.ItemType;
+import com.atguigu.lease.web.admin.mapper.*;
+import com.atguigu.lease.web.admin.service.*;
+import com.atguigu.lease.web.admin.vo.apartment.ApartmentDetailVo;
+import com.atguigu.lease.web.admin.vo.apartment.ApartmentItemVo;
+import com.atguigu.lease.web.admin.vo.apartment.ApartmentQueryVo;
+import com.atguigu.lease.web.admin.vo.apartment.ApartmentSubmitVo;
+import com.atguigu.lease.web.admin.vo.fee.FeeValueVo;
+import com.atguigu.lease.web.admin.vo.graph.GraphVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.atguigu.lease.model.entity.ApartmentInfo;
-import com.atguigu.lease.web.admin.service.ApartmentInfoService;
-import com.atguigu.lease.web.admin.mapper.ApartmentInfoMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author HP
@@ -14,7 +30,130 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, ApartmentInfo>
     implements ApartmentInfoService{
+    @Autowired
+    private ApartmentInfoMapper apartmentInfoMapper;
+    @Autowired
+    private GraphInfoMapper graphInfoMapper;
+    @Autowired
+    private LabelInfoMapper labelInfoMapper;
+    @Autowired
+    private FacilityInfoMapper facilityInfoMapper;
+    @Autowired
+    private FeeValueMapper feeValueMapper;
+    @Autowired
+    private GraphInfoService graphInfoService;
+    @Autowired
+    private ApartmentLabelService  apartmentLabelService;
+    @Autowired
+    private ApartmentFacilityService apartmentFacilityService;
+    @Autowired
+    private ApartmentFeeValueService apartmentFeeValueService;
 
+
+    @Override
+    public IPage<ApartmentItemVo> pageItem(Page<ApartmentItemVo> apartmentItemVoPage, ApartmentQueryVo queryVo) {
+
+
+
+        return apartmentInfoMapper.pageApartmentItemByQuery(apartmentItemVoPage, queryVo);
+    }
+
+    @Override
+    public ApartmentDetailVo getDetailById(Long id) {
+        ApartmentInfo apartmentInfo = this.getById(id);
+        if (apartmentInfo == null) {
+            return null;
+        }
+        //获取图片列表信息
+        List<GraphVo> graphInfos = graphInfoMapper.seletctListByItemIdAndType(ItemType.APARTMENT, id);
+        //获取标签列表信息
+        List<LabelInfo> labelInfoList = labelInfoMapper.selectListByItemIdAndType(ItemType.APARTMENT, id);
+        //获取配套信息
+        List <FacilityInfo>list = facilityInfoMapper.selectListById( id);
+        //获取杂费信息
+        List<FeeValueVo> feeValueVoList = feeValueMapper.selectListById( id);
+         ApartmentDetailVo apartmentDetailVo = new ApartmentDetailVo();
+
+        BeanUtils.copyProperties(apartmentInfo, apartmentDetailVo);
+        apartmentDetailVo.setGraphVoList(graphInfos);
+        apartmentDetailVo.setLabelInfoList(labelInfoList);
+        apartmentDetailVo.setFacilityInfoList(list);
+        apartmentDetailVo.setFeeValueVoList(feeValueVoList);
+        return apartmentDetailVo;
+
+
+
+
+
+
+    }
+
+    @Override
+    public void saveOrUpdateApa(ApartmentSubmitVo apartmentSubmitVo) {
+        //删除公寓信息
+            boolean isUpdate = apartmentSubmitVo.getId() != null;
+            super.saveOrUpdate(apartmentSubmitVo);
+            if (isUpdate){
+                //删除图片列表
+                graphInfoService.remove (new LambdaQueryWrapper<GraphInfo>().eq(GraphInfo::getItemId, apartmentSubmitVo.getId()).eq(GraphInfo::getItemType, ItemType.APARTMENT));
+                //删除标签列表
+                apartmentLabelService.remove(new LambdaQueryWrapper<ApartmentLabel>().eq(ApartmentLabel::getApartmentId, apartmentSubmitVo.getId()));
+                //删除配套设施列表
+                apartmentFacilityService.remove(new LambdaQueryWrapper<ApartmentFacility>().eq(ApartmentFacility::getApartmentId, apartmentSubmitVo.getId()));
+                //删除杂费列表
+                apartmentFeeValueService.remove(new LambdaQueryWrapper<ApartmentFeeValue>().eq(ApartmentFeeValue::getApartmentId, apartmentSubmitVo.getId()));
+
+
+
+
+            }
+            //插入图片列表
+            List<GraphVo> graphVoList = apartmentSubmitVo.getGraphVoList();
+            if (!CollectionUtils.isEmpty(graphVoList)) {
+                List<GraphInfo> graphInfos = new ArrayList<>();
+                for (GraphVo graphVo : graphVoList) {
+                     GraphInfo graphInfo = new GraphInfo();
+                     graphInfo.setName(graphVo.getName());
+                     graphInfo.setUrl(graphVo.getUrl());
+                     graphInfo.setItemType(ItemType.APARTMENT);
+                     graphInfo.setItemId(apartmentSubmitVo.getId());
+                    graphInfos.addAll(graphInfos);
+                }
+                graphInfoService.saveBatch(graphInfos);
+
+            }
+            //插入标签列表
+            List<Long> labelIds = apartmentSubmitVo.getLabelIds();
+            if (!CollectionUtils.isEmpty(labelIds)) {
+                List<ApartmentLabel> apartmentLabels = new ArrayList<>();
+                for (Long labelId : labelIds) {
+//                    ApartmentLabel apartmentLabel = new ApartmentLabel();
+//                    apartmentLabel.setApartmentId(apartmentSubmitVo.getId());
+//                    apartmentLabel.setLabelId(labelId);
+//                    apartmentLabels.add(apartmentLabel);
+                    apartmentLabels.add(ApartmentLabel.builder().apartmentId(apartmentSubmitVo.getId()).labelId(labelId).build());
+                }
+
+                apartmentLabelService.saveBatch(apartmentLabels);
+            }
+            //插入配套设施列表
+        List<Long> facilityInfoIds = apartmentSubmitVo.getFacilityInfoIds();
+            if(!CollectionUtils.isEmpty(facilityInfoIds)){
+            List<ApartmentFacility> apartmentFacilities = new ArrayList<>();
+            for (Long facilityId : facilityInfoIds) {
+                apartmentFacilities.add(ApartmentFacility.builder().apartmentId(apartmentSubmitVo.getId()).facilityId(facilityId).build());
+            }
+        }
+        //插入杂费列表
+        List<Long> feeValueIds = apartmentSubmitVo.getFeeValueIds();
+            if (!CollectionUtils.isEmpty(feeValueIds)) {
+                List<ApartmentFeeValue> apartmentFeeValues = new ArrayList<>();
+                for (Long feeId : feeValueIds) {
+                    apartmentFeeValues.add(ApartmentFeeValue.builder().apartmentId(apartmentSubmitVo.getId()).feeValueId(feeId).build());
+                }
+                apartmentFeeValueService.saveBatch(apartmentFeeValues);
+            }
+    }
 }
 
 
