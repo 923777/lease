@@ -21,4 +21,7 @@
         avatar_url,nickname,status,
         create_time,update_time,is_deleted
     </sql>
+    <select id="pageByQuerVo" resultType="com.atguigu.lease.model.entity.UserInfo">
+        select * from user_info where is_deleted = 0 and phone like concat('%',#{queryVo.phone},'%') and status = #{queryVo.status}
+    </select>
 </mapper>

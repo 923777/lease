@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.lease.model.entity.GraphInfo;
 import com.atguigu.lease.web.admin.service.GraphInfoService;
 import com.atguigu.lease.web.admin.mapper.GraphInfoMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author HP
@@ -14,7 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class GraphInfoServiceImpl extends ServiceImpl<GraphInfoMapper, GraphInfo>
     implements GraphInfoService{
+    @Autowired
+    private GraphInfoMapper graphInfoMapper;
 
+    @Override
+    public List<String> listIsDelete() {
+        List<String> list =graphInfoMapper.listIsDelete();
+        return list;
+    }
 }
 
 

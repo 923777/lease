@@ -29,7 +29,7 @@ public class FileUploadController {
     @PostMapping("upload")
     public Result<String> upload(@RequestParam MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String url = fileUploadService.upload(file);
-        return Result.ok();
+        return Result.ok(url);
     }
 
 }

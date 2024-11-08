@@ -29,4 +29,10 @@
           and item_type=#{itemType}
           and item_id=#{id}
     </select>
+    <select id="listIsDelete" resultType="java.lang.String">
+        select url from graph_info where is_deleted=1
+    </select>
+    <select id="graphVoById" resultType="com.atguigu.lease.web.admin.vo.graph.GraphVo">
+        select url,name from graph_info where item_id=#{id} and item_type=#{itemType}
+    </select>
 </mapper>

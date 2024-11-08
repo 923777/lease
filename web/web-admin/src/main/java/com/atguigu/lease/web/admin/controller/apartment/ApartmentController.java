@@ -5,10 +5,15 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.ApartmentInfo;
 import com.atguigu.lease.model.enums.ReleaseStatus;
 import com.atguigu.lease.web.admin.service.ApartmentInfoService;
+import com.atguigu.lease.web.admin.service.CityInfoService;
+import com.atguigu.lease.web.admin.service.DistrictInfoService;
+import com.atguigu.lease.web.admin.service.ProvinceInfoService;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentDetailVo;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentQueryVo;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentSubmitVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +30,7 @@ import java.util.List;
 public class ApartmentController {
     @Autowired
     private ApartmentInfoService apartmentInfoService;
+
 
     @Operation(summary = "保存或更新公寓信息")
     @PostMapping("saveOrUpdate")
@@ -45,25 +51,32 @@ public class ApartmentController {
     @GetMapping("getDetailById")
     public Result<ApartmentDetailVo> getDetailById(@RequestParam Long id) {
         ApartmentDetailVo apartmentDetailVo = apartmentInfoService.getDetailById(id);
+
         return Result.ok(apartmentDetailVo);
     }
 
     @Operation(summary = "根据id删除公寓信息")
     @DeleteMapping("removeById")
     public Result removeById(@RequestParam Long id) {
+        apartmentInfoService.removeapartmentInfoById(id);
         return Result.ok();
     }
 
     @Operation(summary = "根据id修改公寓发布状态")
     @PostMapping("updateReleaseStatusById")
     public Result updateReleaseStatusById(@RequestParam Long id, @RequestParam ReleaseStatus status) {
+        apartmentInfoService.update(new LambdaUpdateWrapper<ApartmentInfo>().eq(ApartmentInfo::getId, id).set(ApartmentInfo::getIsRelease, status));
         return Result.ok();
     }
 
     @Operation(summary = "根据区县id查询公寓信息列表")
     @GetMapping("listInfoByDistrictId")
     public Result<List<ApartmentInfo>> listInfoByDistrictId(@RequestParam Long id) {
-        return Result.ok();
+        LambdaQueryWrapper<ApartmentInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ApartmentInfo::getDistrictId, id);
+        List<ApartmentInfo> list = apartmentInfoService.list(queryWrapper);
+        return Result.ok(list);
+
     }
 }
 

@@ -1,5 +1,7 @@
 package com.atguigu.lease.web.admin.service.impl;
 
+import com.atguigu.lease.common.exception.LeaseException;
+import com.atguigu.lease.common.result.ResultCodeEnum;
 import com.atguigu.lease.model.entity.*;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.web.admin.mapper.*;
@@ -48,6 +50,14 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
     private ApartmentFacilityService apartmentFacilityService;
     @Autowired
     private ApartmentFeeValueService apartmentFeeValueService;
+    @Autowired
+    private RoomInfoMapper roomInfoMapper;
+    @Autowired
+    private ProvinceInfoMapper provinceInfoMapper;
+    @Autowired
+    private CityInfoMapper cityInfoMapper;
+    @Autowired
+        private DistrictInfoMapper districtInfoMapper;
 
 
     @Override
@@ -80,7 +90,7 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
         apartmentDetailVo.setFacilityInfoList(list);
         apartmentDetailVo.setFeeValueVoList(feeValueVoList);
         return apartmentDetailVo;
-
+        //查出地址详情
 
 
 
@@ -92,7 +102,20 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
     public void saveOrUpdateApa(ApartmentSubmitVo apartmentSubmitVo) {
         //删除公寓信息
             boolean isUpdate = apartmentSubmitVo.getId() != null;
-            super.saveOrUpdate(apartmentSubmitVo);
+        Long provinceId = apartmentSubmitVo.getProvinceId();
+        Long cityId = apartmentSubmitVo.getCityId();
+        Long districtId = apartmentSubmitVo.getDistrictId();
+
+        ProvinceInfo provinceInfo = provinceInfoMapper.selectById(provinceId);
+        CityInfo cityInfo = cityInfoMapper.selectById(cityId);
+        DistrictInfo districtInfo = districtInfoMapper.selectById(districtId);
+
+
+        apartmentSubmitVo.setProvinceName(provinceInfo.getName());
+        apartmentSubmitVo.setCityName(cityInfo.getName());
+        apartmentSubmitVo.setDistrictName(districtInfo.getName());
+
+        super.saveOrUpdate(apartmentSubmitVo);
             if (isUpdate){
                 //删除图片列表
                 graphInfoService.remove (new LambdaQueryWrapper<GraphInfo>().eq(GraphInfo::getItemId, apartmentSubmitVo.getId()).eq(GraphInfo::getItemType, ItemType.APARTMENT));
@@ -117,7 +140,7 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
                      graphInfo.setUrl(graphVo.getUrl());
                      graphInfo.setItemType(ItemType.APARTMENT);
                      graphInfo.setItemId(apartmentSubmitVo.getId());
-                    graphInfos.addAll(graphInfos);
+                    graphInfos.add(graphInfo);
                 }
                 graphInfoService.saveBatch(graphInfos);
 
@@ -153,6 +176,28 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
                 }
                 apartmentFeeValueService.saveBatch(apartmentFeeValues);
             }
+    }
+
+    @Override
+    public void removeapartmentInfoById(Long id) {
+        if (roomInfoMapper.selectCount(new LambdaQueryWrapper<RoomInfo>().eq(RoomInfo::getApartmentId,id))>0){
+            throw new LeaseException(ResultCodeEnum.DELETE_ERROR);
+        }
+        super.removeById(id);
+        //删除图片列表
+        graphInfoService.remove(new LambdaQueryWrapper<GraphInfo>().eq(GraphInfo::getItemId, id).eq(GraphInfo::getItemType, ItemType.APARTMENT));
+        //删除标签列表
+        apartmentLabelService.remove(new LambdaQueryWrapper<ApartmentLabel>().eq(ApartmentLabel::getApartmentId, id));
+        //删除配套设施列表
+        apartmentFacilityService.remove(new LambdaQueryWrapper<ApartmentFacility>().eq(ApartmentFacility::getApartmentId, id));
+        //删除杂费列表
+        apartmentFeeValueService.remove(new LambdaQueryWrapper<ApartmentFeeValue>().eq(ApartmentFeeValue::getApartmentId, id));
+
+
+
+
+
+
     }
 }
 

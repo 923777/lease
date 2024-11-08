@@ -19,7 +19,7 @@ public class AgreementQueryVo {
     @Schema(description = "公寓id")
     private Long apartmentId;
 
-    @Schema(description = "房间号")
+    @Schema(description = "房号")
     private String roomNumber;
 
     @Schema(description = "用户姓名")

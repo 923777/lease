@@ -21,5 +21,7 @@ public interface ApartmentInfoService extends IService<ApartmentInfo> {
     ApartmentDetailVo getDetailById(Long id);
 
     void saveOrUpdateApa(ApartmentSubmitVo apartmentSubmitVo);
+
+    void removeapartmentInfoById(Long id);
 }
 

@@ -18,13 +18,10 @@ Spring:
     pool-name: SPHHikariPool # 连接池名称
 
 #用于打印框架生成的sql语句，便于调试
+#用于打印框架生成的sql语句，便于调试
 mybatis-plus:
-  global-config:
-    db-config:
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#      logic-delete-field:is_deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 minio:
   endpoint: http://192.168.123.100:9000
@@ -32,4 +29,21 @@ minio:
   secretKey: minioadmin
   bucketName: lease
 
+spring:
+  jackson:
+    time-zone: GMT+8
+  data:
+    redis:
+      host: 192.168.123.100
+      port: 6379
+
+#mybatis-plus:
+#  global-config:
+#    db-config:
+#      update-strategy: <strategy>
+admin:
+  auth:
+    path-patterns:
+      include: /admin/**
+      exclude: /admin/login/**
 

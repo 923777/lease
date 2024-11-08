@@ -1,7 +1,11 @@
 package com.atguigu.lease.web.admin.mapper;
 
+import com.atguigu.lease.model.entity.LabelInfo;
+import com.atguigu.lease.model.entity.RoomInfo;
 import com.atguigu.lease.model.entity.RoomLabel;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author HP
@@ -11,6 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface RoomLabelMapper extends BaseMapper<RoomLabel> {
 
+    List<LabelInfo> roomLableById(Long id);
 }
 
 
