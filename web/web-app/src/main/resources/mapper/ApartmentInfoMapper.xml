@@ -5,4 +5,5 @@
 <mapper namespace="com.atguigu.lease.web.app.mapper.ApartmentInfoMapper">
 
 
+
 </mapper>

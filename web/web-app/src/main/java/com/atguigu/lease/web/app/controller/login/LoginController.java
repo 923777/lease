@@ -4,6 +4,7 @@ package com.atguigu.lease.web.app.controller.login;
 
 import com.atguigu.lease.common.context.LoginUserContext;
 import com.atguigu.lease.common.result.Result;
+import com.atguigu.lease.web.app.service.ApartmentFacilityService;
 import com.atguigu.lease.web.app.service.LoginService;
 import com.atguigu.lease.web.app.vo.user.LoginVo;
 import com.atguigu.lease.web.app.vo.user.UserInfoVo;
@@ -19,10 +20,12 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+
     @GetMapping("login/getCode")
     @Operation(summary = "获取短信验证码")
     public Result getCode(@RequestParam String phone) {
         loginService.getCode(phone);
+
         return Result.ok();
     }
 
@@ -36,6 +39,8 @@ public class LoginController {
     @GetMapping("info")
     @Operation(summary = "获取登录用户信息")
     public Result<UserInfoVo> info() {
-        return Result.ok();
+        UserInfoVo userINfo = loginService.getUserInfo(LoginUserContext.getLoginUser().getUserId());
+
+        return Result.ok(userINfo);
     }
 }

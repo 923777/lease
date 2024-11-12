@@ -5,4 +5,9 @@
 <mapper namespace="com.atguigu.lease.web.app.mapper.GraphInfoMapper">
 
 
+    <select id="getGraphInfoList" resultType="com.atguigu.lease.web.app.vo.graph.GraphVo">
+        select url,name
+        from graph_info  gi where item_type =#{itemType}  and item_id= #{id}
+    </select>
+
 </mapper>

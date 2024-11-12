@@ -12,6 +12,7 @@ import com.atguigu.lease.web.app.service.LoginService;
 import com.atguigu.lease.web.app.service.SmsService;
 import com.atguigu.lease.web.app.service.UserInfoService;
 import com.atguigu.lease.web.app.vo.user.LoginVo;
+import com.atguigu.lease.web.app.vo.user.UserInfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -86,5 +87,13 @@ public class LoginServiceImpl implements LoginService {
 
         //5.创建并返回TOKEN
         return JwtUtil.createToken(userInfo.getId(), loginVo.getPhone());
+    }
+
+    @Override
+    public UserInfoVo getUserInfo(Long userId) {
+
+        UserInfo one = userInfoService.getOne(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getId, userId));
+
+        return new UserInfoVo(one.getNickname(), one.getAvatarUrl());
     }
 }

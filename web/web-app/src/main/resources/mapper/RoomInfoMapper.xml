@@ -3,5 +3,117 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.lease.web.app.mapper.RoomInfoMapper">
+    <resultMap id="pageItemMap" type="com.atguigu.lease.web.app.vo.room.RoomItemVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="apartmentInfo" javaType="com.atguigu.lease.model.entity.ApartmentInfo" autoMapping="true">
+            <id property="id" column="ai_id"/>
+        </association>
+        <collection property="graphVoList" select="getGraphList" column="id"/>
+        <collection property="labelInfoList" select="getLabelList" column="id"/>
+
+    </resultMap>
+    <select id="getLabelList"   resultType="com.atguigu.lease.model.entity.LabelInfo">
+        select li.name,li.type
+
+        from label_info  li where  li.id in (select label_id
+                                             from room_label where room_id = #{id})
+    </select>
+    <select id="getGraphList"   resultType="com.atguigu.lease.web.app.vo.graph.GraphVo">
+
+        select
+            name,
+            url
+        from graph_info gi where gi.item_id = #{id}     and gi.item_type = 2 and is_deleted = 0
+    </select>
+
+    <select id="pageItem" resultMap="pageItemMap">
+        select
+            ri.id,
+            ri.room_number,
+            ri.rent,
+            ai.id ai_id,
+            ai.name,
+            ai.introduction,
+            ai.district_id,
+            ai.district_name,
+            ai.city_id,
+            ai.city_name,
+            ai.province_id,
+            ai.province_name,
+            ai.address_detail,
+            ai.latitude,
+            ai.longitude,
+            ai.phone,
+            ai.is_release
+
+
+
+
+        from room_info ri left join apartment_info ai  on ri.apartment_id = ai.id and ai.is_deleted = 0
+       
+        <where>
+           ri.is_deleted = 0 and ri.is_release = 1 and ri.id not in (select room_id from lease_agreement la where la.status in (2,5))
+        <if test="queryVo.provinceId != null">
+            and  ai.province_id = #{queryVo.provinceId}
+        </if>
+        <if test="queryVo.cityId != null">
+            and  ai.city_id = #{queryVo.cityId}
+        </if>
+        <if test="queryVo.districtId">
+            and  ai.district_id = #{queryVo.districtId}
+        </if>
+        <if test="queryVo.minRent != null and queryVo.maxRent != null">
+            and  ri.rent between #{queryVo.minRent} and #{queryVo.maxRent}
+        </if>
+        <if test="queryVo.paymentTypeId != null">
+            and ri.id in (select room_id from room_payment_type rp  where rp.payment_type_id=#{queryVo.paymentTypeId})
+        </if>
+        <if test="queryVo.orderType != null and queryVo.orderType != ''">
+           order by ri.rent ${queryVo.orderType}
+        </if>
+        
+        </where>
+
+    </select>
+    <resultMap id="pageItemByApartmentIdMapper" type="com.atguigu.lease.web.app.vo.room.RoomItemVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="apartmentInfo" javaType="com.atguigu.lease.model.entity.ApartmentInfo" autoMapping="true">
+        <id property="id" column="apartment_id"/>
+
+        </association>
+        <collection property="graphVoList" select="getGraphList" ofType="com.atguigu.lease.web.app.vo.graph.GraphVo"  column="id"/>
+        <collection property="labelInfoList" select="getLabelList" ofType="com.atguigu.lease.model.entity.LabelInfo" column="id"/>
+    </resultMap>
+    <select id="pageItemByApartmentId" resultMap="pageItemByApartmentIdMapper">
+        select ri.room_number,
+               ri.id,
+               ri.rent,
+               ai.id apartment_id,
+               ai.name,
+               ai.introduction,
+               ai.district_id,
+               ai.district_name,
+               ai.city_id,
+               ai.city_name,
+               ai.province_id,
+               ai.province_name,
+               ai.address_detail,
+               ai.latitude,
+               ai.longitude,
+               ai.phone,
+               ai.is_release
+
+
+
+        from apartment_info ai left join room_info ri on ri.apartment_id = ai.id and ai.is_deleted = 0 where ri.is_deleted = 0 and ri.is_release = 1 and ai.id = #{id}
+    </select>
+    <select id="selectMinRentByApartmentId" resultType="java.math.BigDecimal">
+        select min(rent)
+
+
+
+        from room_info where apartment_id = #{id} and is_deleted = 0
+    </select>
+
 
 </mapper>

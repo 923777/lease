@@ -5,6 +5,7 @@ import com.atguigu.lease.web.app.mapper.BrowsingHistoryMapper;
 import com.atguigu.lease.web.app.service.BrowsingHistoryService;
 import com.atguigu.lease.web.app.vo.history.HistoryItemVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,8 +25,38 @@ import java.util.Date;
 @Slf4j
 public class BrowsingHistoryServiceImpl extends ServiceImpl<BrowsingHistoryMapper, BrowsingHistory>
         implements BrowsingHistoryService {
+    @Autowired
+    private  BrowsingHistoryMapper browsingHistoryMapper;
 
 
+    @Override
+    public IPage<HistoryItemVo> pageItem(Page<HistoryItemVo> objectPage) {
+        return browsingHistoryMapper.pageItem(objectPage);
+    }
+
+    @Override
+    @Async
+    public void saveHistory(Long userId, Long roomId) {
+        BrowsingHistory browsingHistory = new BrowsingHistory();
+        browsingHistory.setUserId(userId);
+        browsingHistory.setRoomId(roomId);
+        browsingHistory.setBrowseTime(new Date());
+
+        LambdaQueryWrapper<BrowsingHistory> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(BrowsingHistory::getUserId, userId);
+        queryWrapper.eq(BrowsingHistory::getRoomId, roomId);
+        Long count = browsingHistoryMapper.selectCount(queryWrapper);
+
+        if (count > 0) {
+            LambdaUpdateWrapper<BrowsingHistory> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(BrowsingHistory::getUserId, userId);
+            updateWrapper.eq(BrowsingHistory::getRoomId, roomId);
+            browsingHistoryMapper.update(browsingHistory, updateWrapper);
+        } else {
+            this.save(browsingHistory);
+        }
+
+    }
 }
 
 

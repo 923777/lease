@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "公寓信息")
 @RequestMapping("/app/apartment")
-public class ApartmentController {
+public class ApartmentController {@Autowired
+    private  ApartmentInfoService apartmentInfoService;
 
     @Operation(summary = "根据id获取公寓信息")
     @GetMapping("getDetailById")
     public Result<ApartmentDetailVo> getDetailById(@RequestParam Long id) {
-        return Result.ok();
+        ApartmentDetailVo apartmentDetailVo = apartmentInfoService.getDetailById(id);
+
+        return Result.ok(apartmentDetailVo);
     }
 
 

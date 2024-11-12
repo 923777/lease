@@ -5,4 +5,11 @@
 <mapper namespace="com.atguigu.lease.web.app.mapper.LabelInfoMapper">
 
 
+    <select id="getLabelInfoList" resultType="com.atguigu.lease.model.entity.LabelInfo">
+        select *
+
+
+
+        from label_info where label_info.id in (select label_id from apartment_label where is_deleted = 0 and apartment_id = #{Id})
+    </select>
 </mapper>

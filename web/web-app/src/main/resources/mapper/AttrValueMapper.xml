@@ -5,4 +5,11 @@
 <mapper namespace="com.atguigu.lease.web.app.mapper.AttrValueMapper">
 
 
+    <select id="getAttrValueList" resultType="com.atguigu.lease.web.app.vo.attr.AttrValueVo">
+        select av.id, av.name, av.attr_key_id, av.create_time, av.update_time, av.is_deleted,
+               ak.name attrKeyName
+        from room_attr_value  rav left join attr_value av on rav.attr_value_id = av.id and av.is_deleted = 0
+                                  left join attr_key ak on  ak.id = av.attr_key_id and ak.is_deleted = 0
+        where rav.is_deleted = 0 and rav.room_id = #{Id}
+    </select>
 </mapper>

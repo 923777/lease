@@ -20,7 +20,7 @@ private Client client;
         sendSmsRequest.setTemplateCode("SMS_154950909");
        sendSmsRequest.setTemplateParam("{\"code\":\"" + code + "\"}\n");
         try {
-            client.sendSms(sendSmsRequest);
+//            client.sendSms(sendSmsRequest);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

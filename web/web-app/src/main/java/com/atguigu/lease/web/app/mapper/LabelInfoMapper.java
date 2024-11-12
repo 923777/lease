@@ -1,6 +1,7 @@
 package com.atguigu.lease.web.app.mapper;
 
 import com.atguigu.lease.model.entity.LabelInfo;
+import com.atguigu.lease.model.enums.ItemType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.List;
 * @Entity com.atguigu.lease.model.entity.LabelInfo
 */
 public interface LabelInfoMapper extends BaseMapper<LabelInfo> {
+
+
+    List<LabelInfo> getLabelInfoList(Long id);
 
 
 }
